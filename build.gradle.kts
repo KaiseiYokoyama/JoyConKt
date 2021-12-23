@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation("org.hid4java:hid4java:0.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 }
 
 dependencies {

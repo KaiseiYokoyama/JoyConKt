@@ -1,11 +1,19 @@
 package io.github.kaiseiyokoyama.joykonkt
 
+import io.github.kaiseiyokoyama.joykonkt.controller.Controller
+import io.github.kaiseiyokoyama.joykonkt.controller.ProController
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.trySendBlocking
+import org.hid4java.HidDevice
 import org.hid4java.HidManager
 import org.hid4java.HidServicesListener
 import org.hid4java.HidServicesSpecification
 import org.hid4java.event.HidServicesEvent
 
-class Manager: HidServicesListener {
+class Manager(
+    val attachedChannel: Channel<Controller>,
+    val detachedChannel: Channel<HidDevice>,
+) : HidServicesListener {
     init {
         val config = HidServicesSpecification()
         config.isAutoStart = false
@@ -17,14 +25,17 @@ class Manager: HidServicesListener {
     }
 
     override fun hidDeviceAttached(event: HidServicesEvent?) {
-        event?.let {
-            println("Attached: ${it.hidDevice.product}")
+        event?.let { it ->
+//            println("Attached: ${it.hidDevice.product}")
+            ProController.tryNew(it.hidDevice)?.let { pc ->
+                attachedChannel.trySendBlocking(pc)
+            }
         }
     }
 
     override fun hidDeviceDetached(event: HidServicesEvent?) {
         event?.let {
-            println("Detached: ${it.hidDevice.product}")
+            detachedChannel.trySendBlocking(it.hidDevice)
         }
     }
 
