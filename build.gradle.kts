@@ -2,10 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.10"
+    id("maven-publish")
 }
 
 group = "me.kyokoyama.joyconkt"
-version = "1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -26,4 +27,18 @@ tasks.test {
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = group.toString()
+                artifactId = "joyconkt"
+                version = "0.1.0"
+
+                from(components["kotlin"])
+            }
+        }
+    }
 }
