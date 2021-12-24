@@ -9,8 +9,7 @@ import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import kotlinx.coroutines.channels.Channel
 
 fun main() {
-    val ach = Channel<Controller>()
-    Manager(ach, Channel())
+    val ach = Manager.attachedChannel
 
     var controller: Controller? = null
 

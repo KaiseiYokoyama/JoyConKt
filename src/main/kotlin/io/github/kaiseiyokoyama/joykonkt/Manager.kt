@@ -10,10 +10,10 @@ import org.hid4java.HidServicesListener
 import org.hid4java.HidServicesSpecification
 import org.hid4java.event.HidServicesEvent
 
-class Manager(
-    val attachedChannel: Channel<Controller>,
-    val detachedChannel: Channel<HidDevice>,
-) : HidServicesListener {
+object Manager : HidServicesListener {
+    val attachedChannel: Channel<Controller> = Channel()
+    val detachedChannel: Channel<HidDevice> = Channel()
+
     init {
         val config = HidServicesSpecification()
         config.isAutoStart = false
