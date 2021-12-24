@@ -1,5 +1,6 @@
 package io.github.kaiseiyokoyama.joykonkt.controller
 
+import io.github.kaiseiyokoyama.joykonkt.controller.report.output.PlayerLight
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
 
@@ -41,6 +42,13 @@ interface Controller {
     fun sendSubCommand(subCommand: SubCommand, argument: Array<Byte> = arrayOf()): Int
 
     fun rumble(l: Rumble, r: Rumble): Int
+
+    fun setPlayerLights(
+        led0: PlayerLight, // Closest led to SL Button
+        led1: PlayerLight,
+        led2: PlayerLight,
+        led3: PlayerLight, // Closest led to SR Button
+    ): Int = sendSubCommand(SubCommand.SetPlayerLights, arrayOf(PlayerLight.decode(led0, led1, led2, led3).toByte()))
 
     fun devices(): Array<HidDevice>
 

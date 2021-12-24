@@ -11,6 +11,7 @@ enum class SubCommand(
      * - 0x3F: Simple HID mode
      */
     SetInputReportMode(0x03),
+    SetPlayerLights(0x30),
     EnableIMU(0x40),
     EnableVibration(0x48),
 }

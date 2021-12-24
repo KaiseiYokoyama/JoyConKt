@@ -4,6 +4,7 @@ import io.github.kaiseiyokoyama.joykonkt.controller.Controller
 import io.github.kaiseiyokoyama.joykonkt.controller.InputMode
 import io.github.kaiseiyokoyama.joykonkt.controller.SubCommand
 import io.github.kaiseiyokoyama.joykonkt.controller.report.input.ID
+import io.github.kaiseiyokoyama.joykonkt.controller.report.output.PlayerLight
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import kotlinx.coroutines.channels.Channel
 
@@ -47,6 +48,13 @@ fun main() {
 //        )
 //        Thread.sleep(400)
     }
+    normalModeController.controller.setPlayerLights(
+        PlayerLight.Flash,
+        PlayerLight.On,
+        PlayerLight.On,
+        PlayerLight.Flash,
+    )
+
     while (true) normalModeController.controller.rumble(
         Rumble(0.0, 0.0),
         Rumble(0.0, 0.0),
