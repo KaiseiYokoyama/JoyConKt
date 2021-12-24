@@ -1,5 +1,6 @@
 package io.github.kaiseiyokoyama.joykonkt.controller
 
+import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
 
 class ProController private constructor(
@@ -12,11 +13,10 @@ class ProController private constructor(
         const val PRODUCT: Int = 8201
 
         /**
-         * インスタンス作成
+         * Try to create instance
          */
         fun tryNew(hid: HidDevice): ProController? {
             return when (Pair(hid.vendorId, hid.productId)) {
-                // ベンダーIDおよびプロダクトIDが正しい時
                 Pair(Controller.VENDOR, PRODUCT) -> {
                     ProController(hid)
                 }
@@ -27,6 +27,8 @@ class ProController private constructor(
 
     init {
         if (!hid.isOpen) hid.open()
+
+        init()
     }
 
     val serialNumber = hid.serialNumber
@@ -36,29 +38,57 @@ class ProController private constructor(
         return "Pro Controller $hid"
     }
 
+    override var globalPacketNumber: UInt = 0u
+
     // -- Implementation of Controller interface --
 
     override fun setNonBlocking(nonBlocking: Boolean) = hid.setNonBlocking(nonBlocking)
 
-    override fun read() = hid.read().toByteArray()
+    override fun read(timeoutMillis: Int?): ByteArray = if (timeoutMillis != null) {
+        hid.read(Controller.MAX_REPORT_LEN, timeoutMillis).toByteArray()
+    } else {
+        hid.read().toByteArray()
+    }
 
-    override fun read(data: ByteArray): Int = hid.read(data)
+    override fun sendSubCommand(subCommand: SubCommand, argument: Array<Byte>): Int {
+        val message = subCommandMessage(subCommand = subCommand, argument = argument)
 
-    override fun read(amount: Int): ByteArray = hid.read(amount).toByteArray()
+        return hid.write(
+            message,
+            message.size,
+            subCommand.byte
+        )
+    }
 
-    override fun read(amount: Int, timeoutMillis: Int): ByteArray = hid.read(amount, timeoutMillis).toByteArray()
+    override fun rumble(l: Rumble, r: Rumble): Int {
+        val subCommand = SubCommand.GetControllerState
+        val message= subCommandMessage(l, r, subCommand)
 
-    override fun read(bytes: ByteArray, timeoutMillis: Int): Int = hid.read(bytes, timeoutMillis)
-
-    override fun getFeatureReport(data: ByteArray, reportId: Byte): Int = hid.getFeatureReport(data, reportId)
-
-    override fun sendFeatureReport(data: ByteArray, reportId: Byte): Int = hid.sendFeatureReport(data, reportId)
+        return hid.write(
+            message,
+            message.size,
+            subCommand.byte
+        )
+    }
 
     override fun getIndexedString(index: Int): String = hid.getIndexedString(index)
-
-    override fun write(message: ByteArray, packetLength: Int, reportId: Byte): Int = hid.write(message, packetLength, reportId)
 
     override fun devices(): Array<HidDevice> = arrayOf(hid)
 
     override fun close() = hid.close()
+
+//    override fun read() = hid.read().toByteArray()
+//
+//    override fun read(data: ByteArray): Int = hid.read(data)
+//
+//    override fun read(amount: Int): ByteArray = hid.read(amount).toByteArray()
+//
+//    override fun read(amount: Int, timeoutMillis: Int): ByteArray = hid.read(amount, timeoutMillis).toByteArray()
+//
+//    override fun read(bytes: ByteArray, timeoutMillis: Int): Int = hid.read(bytes, timeoutMillis)
+//
+//    override fun getFeatureReport(data: ByteArray, reportId: Byte): Int = hid.getFeatureReport(data, reportId)
+//
+//    override fun sendFeatureReport(data: ByteArray, reportId: Byte): Int = hid.sendFeatureReport(data, reportId)
+//    override fun write(message: ByteArray, packetLength: Int, reportId: Byte): Int = hid.write(message, packetLength, reportId)
 }
