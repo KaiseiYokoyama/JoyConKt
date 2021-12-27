@@ -8,7 +8,7 @@ import io.github.kaiseiyokoyama.joykonkt.controller.report.input.StandardFullRep
 sealed interface InputMode<T : InputReport> {
     fun init(controller: Controller)
 
-    fun read(timeoutMillis: Int?): ByteArray
+    fun read(timeoutMillis: Int?): Result<ByteArray>
 
     fun receive(timeoutMillis: Int? = null): Result<T>
 
@@ -29,17 +29,26 @@ sealed interface InputMode<T : InputReport> {
             controller.sendSubCommand(SubCommand.SetInputReportMode, arrayOf(0x3F))
         }
 
-        override fun read(timeoutMillis: Int?): ByteArray = controller.read(timeoutMillis)
+        override fun read(timeoutMillis: Int?): Result<ByteArray> = controller.read(timeoutMillis)
 
-        override fun receive(timeoutMillis: Int?): Result<NormalReport> =
-            NormalReport.parse(read(timeoutMillis))
+        override fun receive(timeoutMillis: Int?): Result<NormalReport> {
+            read(timeoutMillis)
+                .onFailure {
+                    return Result.failure(it)
+                }
+                .onSuccess {
+                    return NormalReport.parse(it)
+                }
+
+            TODO("Unreachable")
+        }
 
         override fun unwrap() = controller
     }
 
     class StandardFullMode(
         val controller: Controller,
-        private val inputReportID: ID,
+        private val inputReportID: ID = ID.StandardFullMode,
     ) : InputMode<StandardFullReport> {
         init {
             init(controller)
@@ -50,10 +59,19 @@ sealed interface InputMode<T : InputReport> {
             controller.sendSubCommand(SubCommand.SetInputReportMode, arrayOf(0x30))
         }
 
-        override fun read(timeoutMillis: Int?): ByteArray = controller.read(timeoutMillis)
+        override fun read(timeoutMillis: Int?): Result<ByteArray> = controller.read(timeoutMillis)
 
-        override fun receive(timeoutMillis: Int?): Result<StandardFullReport> =
-            StandardFullReport.parse(read(timeoutMillis))
+        override fun receive(timeoutMillis: Int?): Result<StandardFullReport> {
+            read(timeoutMillis)
+                .onFailure {
+                    return Result.failure(it)
+                }
+                .onSuccess {
+                    return StandardFullReport.parse(it)
+                }
+
+            TODO("Unreachable")
+        }
 
         override fun unwrap(): Controller = controller
     }

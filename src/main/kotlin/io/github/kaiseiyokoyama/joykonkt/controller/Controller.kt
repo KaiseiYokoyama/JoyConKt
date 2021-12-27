@@ -21,7 +21,7 @@ interface Controller {
 
     fun setNonBlocking(nonBlocking: Boolean)
 
-    fun read(timeoutMillis: Int?): ByteArray
+    fun read(timeoutMillis: Int?): Result<ByteArray>
 
 //    fun read(data: ByteArray): Int
 //

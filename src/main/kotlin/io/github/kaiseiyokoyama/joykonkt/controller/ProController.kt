@@ -2,6 +2,7 @@ package io.github.kaiseiyokoyama.joykonkt.controller
 
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
+import java.lang.RuntimeException
 
 class ProController private constructor(
     private val hid: HidDevice
@@ -44,10 +45,18 @@ class ProController private constructor(
 
     override fun setNonBlocking(nonBlocking: Boolean) = hid.setNonBlocking(nonBlocking)
 
-    override fun read(timeoutMillis: Int?): ByteArray = if (timeoutMillis != null) {
-        hid.read(Controller.MAX_REPORT_LEN, timeoutMillis).toByteArray()
-    } else {
-        hid.read().toByteArray()
+    override fun read(timeoutMillis: Int?): Result<ByteArray> {
+        return try {
+            Result.success(
+                if (timeoutMillis != null) {
+                    hid.read(Controller.MAX_REPORT_LEN, timeoutMillis).toByteArray()
+                } else {
+                    hid.read().toByteArray()
+                }
+            )
+        } catch (e: NegativeArraySizeException) {
+            Result.failure(e)
+        }
     }
 
     override fun sendSubCommand(subCommand: SubCommand, argument: Array<Byte>): Int {
@@ -62,7 +71,7 @@ class ProController private constructor(
 
     override fun rumble(l: Rumble, r: Rumble): Int {
         val subCommand = SubCommand.GetControllerState
-        val message= subCommandMessage(l, r, subCommand)
+        val message = subCommandMessage(l, r, subCommand)
 
         return hid.write(
             message,
