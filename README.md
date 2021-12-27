@@ -2,6 +2,20 @@
 
 Utilized `hidapi` for JoyCon and Pro Controller.
 
+## `build.gradle.kts`
+```kotlin
+allprojects {
+    repositories {
+        maven("https://jitpack.io")
+    }
+}
+
+dependencies {
+    implementation("org.hid4java:hid4java:0.7.0")
+    implementation("com.github.KaiseiYokoyama:JoyConKt:v0.2.0")
+}
+```
+
 ## Unique Point
 `JoyConKt` does not include `GLFW`. 
 
