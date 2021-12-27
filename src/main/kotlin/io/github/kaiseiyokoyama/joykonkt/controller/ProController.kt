@@ -1,5 +1,6 @@
 package io.github.kaiseiyokoyama.joykonkt.controller
 
+import io.github.kaiseiyokoyama.joykonkt.controller.report.output.ID
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
 import java.lang.RuntimeException
@@ -65,7 +66,8 @@ class ProController private constructor(
         return hid.write(
             message,
             message.size,
-            subCommand.byte
+            ID.RumbleSubCommand.intValue.toByte(),
+//            subCommand.byte
         )
     }
 
@@ -76,7 +78,7 @@ class ProController private constructor(
         return hid.write(
             message,
             message.size,
-            subCommand.byte
+            ID.RumbleSubCommand.intValue.toByte(),
         )
     }
 
