@@ -17,8 +17,8 @@ sealed interface InputMode<T : InputReport> {
     /**
      * WIP especially for Pro Controller
      */
-    class NormalMode(
-        val controller: Controller
+    class NormalMode<C : Controller>(
+        val controller: C
     ) : InputMode<NormalReport> {
         init {
             init(controller)
@@ -40,8 +40,8 @@ sealed interface InputMode<T : InputReport> {
         override fun unwrap() = controller
     }
 
-    class StandardFullMode(
-        val controller: Controller,
+    class StandardFullMode<C : Controller>(
+        val controller: C,
         private val inputReportID: ID = ID.StandardFullMode,
     ) : InputMode<StandardFullReport> {
         init {
