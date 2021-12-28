@@ -1,13 +1,17 @@
 package io.github.kaiseiyokoyama.joykonkt.controller
 
+import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sticks
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.ID
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
 import java.lang.RuntimeException
 
 class ProController private constructor(
-    private val hid: HidDevice
+    private val hid: HidDevice,
 ) : Controller {
+    override lateinit var factoryCalibration: Sticks
+//    override lateinit var userCalibration: Sticks
+
     companion object {
         /**
          * プロダクトID

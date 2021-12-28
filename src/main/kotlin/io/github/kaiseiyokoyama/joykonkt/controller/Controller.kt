@@ -2,6 +2,7 @@ package io.github.kaiseiyokoyama.joykonkt.controller
 
 import io.github.kaiseiyokoyama.joykonkt.controller.report.input.SPIFlashRead
 import io.github.kaiseiyokoyama.joykonkt.controller.report.input.StandardFullReport
+import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sticks
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.PlayerLight
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
@@ -10,6 +11,8 @@ import java.nio.ByteOrder
 
 interface Controller {
     var globalPacketNumber: UInt
+    var factoryCalibration: Sticks
+//    var userCalibration: Sticks
 
     companion object {
         const val VENDOR: Int = 1406
@@ -21,6 +24,25 @@ interface Controller {
         sendSubCommand(SubCommand.EnableIMU, arrayOf(0x01))
         // enable vibration
         sendSubCommand(SubCommand.EnableVibration, arrayOf(0x01))
+
+        // get calibrations
+        spiFlashRead(0x603Du, 18u)?.let { spi ->
+            println(spi)
+            Sticks.parse(spi.data)?.let {
+                factoryCalibration = it
+            }
+        }
+
+//        spiFlashRead(0x8012u, 20u)?.let { spi ->
+//            val data = spi.data
+//            println(spi)
+//            println(spi.data.contentToString())
+//            data.removeAt(9)
+//            data.removeAt(9)
+//            Sticks.parse(data.toByteArray())?.let {
+//                userCalibration = it
+//            }
+//        }
     }
 
     fun setNonBlocking(nonBlocking: Boolean)
