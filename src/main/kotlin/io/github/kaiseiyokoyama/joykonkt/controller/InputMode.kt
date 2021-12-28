@@ -17,8 +17,8 @@ sealed interface InputMode<T : InputReport> {
     /**
      * WIP especially for Pro Controller
      */
-    class NormalMode(
-        val controller: Controller
+    class NormalMode<C : Controller>(
+        val controller: C
     ) : InputMode<NormalReport> {
         init {
             init(controller)
@@ -31,23 +31,17 @@ sealed interface InputMode<T : InputReport> {
 
         override fun read(timeoutMillis: Int?): Result<ByteArray> = controller.read(timeoutMillis)
 
-        override fun receive(timeoutMillis: Int?): Result<NormalReport> {
-            read(timeoutMillis)
-                .onFailure {
-                    return Result.failure(it)
-                }
-                .onSuccess {
-                    return NormalReport.parse(it)
-                }
-
-            TODO("Unreachable")
-        }
+        override fun receive(timeoutMillis: Int?): Result<NormalReport> =
+            read(timeoutMillis).fold(
+                onSuccess = { NormalReport.parse(it) },
+                onFailure = { Result.failure(it) }
+            )
 
         override fun unwrap() = controller
     }
 
-    class StandardFullMode(
-        val controller: Controller,
+    class StandardFullMode<C : Controller>(
+        val controller: C,
         private val inputReportID: ID = ID.StandardFullMode,
     ) : InputMode<StandardFullReport> {
         init {
@@ -61,17 +55,15 @@ sealed interface InputMode<T : InputReport> {
 
         override fun read(timeoutMillis: Int?): Result<ByteArray> = controller.read(timeoutMillis)
 
-        override fun receive(timeoutMillis: Int?): Result<StandardFullReport> {
-            read(timeoutMillis)
-                .onFailure {
-                    return Result.failure(it)
+        override fun receive(timeoutMillis: Int?): Result<StandardFullReport> =
+            read(timeoutMillis).fold(
+                onSuccess = {
+                    StandardFullReport.parse(it)
+                },
+                onFailure = {
+                    Result.failure(it)
                 }
-                .onSuccess {
-                    return StandardFullReport.parse(it)
-                }
-
-            TODO("Unreachable")
-        }
+            )
 
         override fun unwrap(): Controller = controller
     }

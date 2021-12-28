@@ -1,11 +1,18 @@
 package io.github.kaiseiyokoyama.joykonkt.controller
 
+import io.github.kaiseiyokoyama.joykonkt.controller.report.input.SPIFlashRead
+import io.github.kaiseiyokoyama.joykonkt.controller.report.input.StandardFullReport
+import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sticks
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.PlayerLight
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 interface Controller {
     var globalPacketNumber: UInt
+    var factoryCalibration: Sticks
+//    var userCalibration: Sticks
 
     companion object {
         const val VENDOR: Int = 1406
@@ -17,6 +24,25 @@ interface Controller {
         sendSubCommand(SubCommand.EnableIMU, arrayOf(0x01))
         // enable vibration
         sendSubCommand(SubCommand.EnableVibration, arrayOf(0x01))
+
+        // get calibrations
+        spiFlashRead(0x603Du, 18u)?.let { spi ->
+            println(spi)
+            Sticks.parse(spi.data)?.let {
+                factoryCalibration = it
+            }
+        }
+
+//        spiFlashRead(0x8012u, 20u)?.let { spi ->
+//            val data = spi.data
+//            println(spi)
+//            println(spi.data.contentToString())
+//            data.removeAt(9)
+//            data.removeAt(9)
+//            Sticks.parse(data.toByteArray())?.let {
+//                userCalibration = it
+//            }
+//        }
     }
 
     fun setNonBlocking(nonBlocking: Boolean)
@@ -49,6 +75,46 @@ interface Controller {
         led2: PlayerLight,
         led3: PlayerLight, // Closest led to SR Button
     ): Int = sendSubCommand(SubCommand.SetPlayerLights, arrayOf(PlayerLight.decode(led0, led1, led2, led3).toByte()))
+
+    fun spiFlashRead(
+        address: UInt,
+        length: UByte,
+        read: UInt = 50u,
+        timeoutMillis: Int? = null,
+    ): SPIFlashRead? {
+        val buffer = ByteBuffer.allocate(UInt.SIZE_BYTES)
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .putInt(address.toInt())
+
+        val array = arrayOf(
+            *buffer.array().toTypedArray(), // address
+            length.toByte(), // length
+        )
+        sendSubCommand(
+            SubCommand.SPIFlashRead,
+            array
+        )
+
+        for (_i in 0u until read) {
+            read(timeoutMillis).onSuccess {
+                StandardFullReport.parse(it).onSuccess { report ->
+                    when (report.payLoad) {
+                        is StandardFullReport.PayLoad.SubCommandReply ->
+                            if (report.payLoad.subCommand == SubCommand.SPIFlashRead) {
+                                return SPIFlashRead.parse(
+                                    report.payLoad.data
+                                )
+                            }
+                        else -> {
+                            // do nothing
+                        }
+                    }
+                }
+            }
+        }
+
+        return null
+    }
 
     fun devices(): Array<HidDevice>
 

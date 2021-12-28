@@ -1,5 +1,6 @@
 package io.github.kaiseiyokoyama.joykonkt.controller.report.input
 
+import io.github.kaiseiyokoyama.joykonkt.controller.SubCommand
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -129,7 +130,7 @@ data class NormalReport(
                         .toUInt()
 
                     val vertical = ByteBuffer.wrap(
-                        byteArray.subList(2,4).toByteArray()
+                        byteArray.subList(2, 4).toByteArray()
                     )
                         .order(ByteOrder.LITTLE_ENDIAN)
                         .short
@@ -218,7 +219,7 @@ data class StandardFullReport private constructor(
             val vibratorInputReport = data[12]
 
             val payload = when (id) {
-                ID.SubCommandReply -> PayLoad.SubCommandReply(
+                ID.SubCommandReply -> PayLoad.SubCommandReply.parse(
                     data.toList().subList(13, minLength.coerceAtLeast(data.size)).toByteArray()
                 )
                 ID.NFCIR -> PayLoad.NFCIR(
@@ -248,9 +249,29 @@ data class StandardFullReport private constructor(
     sealed class PayLoad(
         val id: ID
     ) {
-        data class SubCommandReply(
-            val reply: ByteArray,
-        ) : PayLoad(ID.SubCommandReply)
+        class SubCommandReply private constructor(
+            val ack: Byte,
+            val subCommand: SubCommand?,
+            val subCommandUByte: UByte,
+            val data: ByteArray,
+        ) : PayLoad(ID.SubCommandReply) {
+            companion object {
+                fun parse(byteArray: ByteArray): SubCommandReply? {
+                    if (byteArray.size < 2) return null
+
+                    val ack = byteArray[0]
+                    val subCommand = SubCommand.fromByte(byteArray[1])
+                    val subCommandUByte = byteArray[1].toUByte()
+                    val data = byteArray.toList()
+                        .subList(2, byteArray.size)
+                        .toByteArray()
+
+                    return SubCommandReply(
+                        ack, subCommand, subCommandUByte, data
+                    )
+                }
+            }
+        }
 
         data class IMUData3Frames private constructor(
             val imudata: Array<IMUData>
