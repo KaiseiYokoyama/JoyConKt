@@ -20,12 +20,12 @@ data class Sticks(
             ) ?: return null
 
             val lStick = Stick(
-                x = Stick.Axis.new(left[2], left[0], left[4]),
-                y = Stick.Axis.new(left[3], left[1], left[5]),
+                horizontal = Stick.Axis.new(left[2], left[0], left[4]),
+                vertical = Stick.Axis.new(left[3], left[1], left[5]),
             )
             val rStick = Stick(
-                x = Stick.Axis.new(right[0], right[4], right[2]),
-                y = Stick.Axis.new(right[1], right[5], right[3]),
+                horizontal = Stick.Axis.new(right[0], right[4], right[2]),
+                vertical = Stick.Axis.new(right[1], right[5], right[3]),
             )
 
             return Sticks(lStick, rStick)
@@ -33,8 +33,8 @@ data class Sticks(
     }
 
     data class Stick(
-        val x: Axis,
-        val y: Axis,
+        val horizontal: Axis,
+        val vertical: Axis,
     ) {
         companion object {
             fun parse(byteArray: ByteArray): List<UShort>? {
