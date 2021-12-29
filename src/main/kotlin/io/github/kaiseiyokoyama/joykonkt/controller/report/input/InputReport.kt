@@ -502,7 +502,20 @@ data class Stick(
     val horizontal: UInt,
     val vertical: UInt,
 ) {
-    fun normalize(calibration: Sticks.Stick): NormalizedStick {
+    fun normalize(
+        calibration: Sticks.Stick = Sticks.Stick(
+            horizontal = Sticks.Stick.Axis(
+                max = 3500u,
+                center = 2000u,
+                min = 500u,
+            ),
+            vertical = Sticks.Stick.Axis(
+                max = 3500u,
+                center = 2000u,
+                min = 500u,
+            ),
+        )
+    ): NormalizedStick {
         val horizontal = if (horizontal > calibration.horizontal.center) {
             (horizontal - calibration.horizontal.center).toFloat() /
                     (calibration.horizontal.max - calibration.horizontal.center).toFloat()
