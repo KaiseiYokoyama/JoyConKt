@@ -1,10 +1,13 @@
 package io.github.kaiseiyokoyama.joykonkt.controller.report.input
 
 import io.github.kaiseiyokoyama.joykonkt.controller.SubCommand
+import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sticks
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.experimental.and
+import kotlin.math.atan2
+import kotlin.math.pow
 
 sealed class InputReport(
     open val inputReportId: ID
@@ -498,7 +501,43 @@ data class StandardFullReport private constructor(
 data class Stick(
     val horizontal: UInt,
     val vertical: UInt,
-)
+) {
+    fun normalize(calibration: Sticks.Stick): NormalizedStick {
+        val horizontal = if (horizontal > calibration.horizontal.center) {
+            (horizontal - calibration.horizontal.center).toFloat() /
+                    (calibration.horizontal.max - calibration.horizontal.center).toFloat()
+        } else {
+            (horizontal - calibration.horizontal.center).toFloat() /
+                    (calibration.horizontal.center - calibration.horizontal.min).toFloat()
+        }
+
+        val vertical = if (vertical > calibration.vertical.center) {
+            (vertical - calibration.vertical.center).toFloat() /
+                    (calibration.vertical.max - calibration.vertical.center).toFloat()
+        } else {
+            (vertical - calibration.vertical.center).toFloat() /
+                    (calibration.vertical.center - calibration.vertical.min).toFloat()
+        }
+
+        val radius = Math.sqrt((vertical.pow(2) + horizontal.pow(2)).toDouble()).toFloat()
+
+        val argument = atan2(
+            vertical.toDouble(),
+            horizontal.toDouble(),
+        ).toFloat()
+
+        return NormalizedStick(
+            horizontal, vertical, radius, argument
+        )
+    }
+
+    data class NormalizedStick(
+        val horizontal: Float,
+        val vertical: Float,
+        val radius: Float,
+        val argument: Float,
+    )
+}
 
 sealed class Error(
     open val byteArray: ByteArray,
