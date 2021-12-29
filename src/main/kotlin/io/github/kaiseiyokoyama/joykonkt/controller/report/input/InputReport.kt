@@ -8,6 +8,7 @@ import java.nio.ByteOrder
 import kotlin.experimental.and
 import kotlin.math.atan2
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 sealed class InputReport(
     open val inputReportId: ID
@@ -516,23 +517,29 @@ data class Stick(
             ),
         )
     ): NormalizedStick {
-        val horizontal = if (horizontal > calibration.horizontal.center) {
-            (horizontal - calibration.horizontal.center).toFloat() /
-                    (calibration.horizontal.max - calibration.horizontal.center).toFloat()
-        } else {
-            (horizontal - calibration.horizontal.center).toFloat() /
-                    (calibration.horizontal.center - calibration.horizontal.min).toFloat()
+        fun normalize(value: Float, min: Float, center: Float, max: Float): Float {
+            return if (value > center) {
+                (value - center) / (max - center)
+            } else {
+                (value - center) / (center - min)
+            }
         }
 
-        val vertical = if (vertical > calibration.vertical.center) {
-            (vertical - calibration.vertical.center).toFloat() /
-                    (calibration.vertical.max - calibration.vertical.center).toFloat()
-        } else {
-            (vertical - calibration.vertical.center).toFloat() /
-                    (calibration.vertical.center - calibration.vertical.min).toFloat()
-        }
+        val horizontal = normalize(
+            value = horizontal.toFloat(),
+            min = calibration.horizontal.min.toFloat(),
+            center = calibration.horizontal.center.toFloat(),
+            max = calibration.horizontal.max.toFloat(),
+        )
 
-        val radius = Math.sqrt((vertical.pow(2) + horizontal.pow(2)).toDouble()).toFloat()
+        val vertical = normalize(
+            value = vertical.toFloat(),
+            min = calibration.vertical.min.toFloat(),
+            center = calibration.vertical.center.toFloat(),
+            max = calibration.vertical.max.toFloat(),
+        )
+
+        val radius = sqrt((vertical.pow(2) + horizontal.pow(2)).toDouble()).toFloat()
 
         val argument = atan2(
             vertical.toDouble(),
