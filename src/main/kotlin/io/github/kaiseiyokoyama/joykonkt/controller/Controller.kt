@@ -27,7 +27,6 @@ interface Controller {
 
         // get calibrations
         spiFlashRead(0x603Du, 18u)?.let { spi ->
-            println(spi)
             Sticks.parse(spi.data)?.let {
                 factoryCalibration = it
             }
