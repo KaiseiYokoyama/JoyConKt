@@ -2,6 +2,7 @@ package io.github.kaiseiyokoyama.joykonkt.controller.report.input
 
 import io.github.kaiseiyokoyama.joykonkt.controller.SubCommand
 import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sticks
+import kotlinx.serialization.Serializable
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -10,10 +11,12 @@ import kotlin.math.atan2
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+@Serializable
 sealed class InputReport(
     open val inputReportId: ID
 )
 
+@Serializable
 data class NormalReport(
     val pressedButtons: Set<Button>,
     val stickDirection: StickDirection,
@@ -65,6 +68,7 @@ data class NormalReport(
         }
     }
 
+    @Serializable
     enum class Button(
         val bit: UByte,
         val index: Int,
@@ -103,6 +107,7 @@ data class NormalReport(
      * | 6  |  8   |  2 |
      * | 5  |  4   |  3 |
      */
+    @Serializable
     enum class StickDirection(
         val byte: UByte
     ) {
@@ -117,6 +122,7 @@ data class NormalReport(
         }
     }
 
+    @Serializable
     data class Sticks(
         val LStick: Stick,
         val RStick: Stick,
@@ -154,6 +160,7 @@ data class NormalReport(
     }
 }
 
+@Serializable
 data class StandardFullReport private constructor(
     val timer: UByte,
     val battery: Battery,
@@ -250,9 +257,11 @@ data class StandardFullReport private constructor(
         }
     }
 
+    @Serializable
     sealed class PayLoad(
         val id: ID
     ) {
+        @Serializable
         class SubCommandReply private constructor(
             val ack: Byte,
             val subCommand: SubCommand?,
@@ -277,6 +286,7 @@ data class StandardFullReport private constructor(
             }
         }
 
+        @Serializable
         data class IMUData3Frames private constructor(
             val imudata: Array<IMUData>
         ) : PayLoad(ID.StandardFullMode) {
@@ -294,6 +304,7 @@ data class StandardFullReport private constructor(
                 }
             }
 
+            @Serializable
             data class IMUData(
                 val acc: Acc,
                 val gyro: Gyro,
@@ -309,6 +320,7 @@ data class StandardFullReport private constructor(
                     }
                 }
 
+                @Serializable
                 data class Acc(
                     val x: Short,
                     val y: Short,
@@ -332,6 +344,7 @@ data class StandardFullReport private constructor(
                     }
                 }
 
+                @Serializable
                 data class Gyro(
                     val xAxis: Short,
                     val yAxis: Short,
@@ -357,11 +370,13 @@ data class StandardFullReport private constructor(
             }
         }
 
+        @Serializable
         data class NFCIR(
             val data: ByteArray,
         ) : PayLoad(ID.NFCIR)
     }
 
+    @Serializable
     data class Battery(
         val level: Level,
         val charging: Boolean,
@@ -375,6 +390,7 @@ data class StandardFullReport private constructor(
             }
         }
 
+        @Serializable
         enum class Level(
             val byte: UByte
         ) {
@@ -388,6 +404,7 @@ data class StandardFullReport private constructor(
         }
     }
 
+    @Serializable
     data class Connection(
         val kind: Kind,
         val powered: Boolean,
@@ -401,6 +418,7 @@ data class StandardFullReport private constructor(
             }
         }
 
+        @Serializable
         enum class Kind(
             val int: UInt
         ) {
@@ -415,6 +433,7 @@ data class StandardFullReport private constructor(
         }
     }
 
+    @Serializable
     data class Buttons(
         val pressedButtons: Set<Button>
     ) {
@@ -469,6 +488,7 @@ data class StandardFullReport private constructor(
         }
     }
 
+    @Serializable
     data class Sticks(
         val LStick: Stick,
         val RStick: Stick,
@@ -499,6 +519,7 @@ data class StandardFullReport private constructor(
     }
 }
 
+@Serializable
 data class Stick(
     val horizontal: UInt,
     val vertical: UInt,
@@ -551,6 +572,7 @@ data class Stick(
         )
     }
 
+    @Serializable
     data class NormalizedStick(
         val horizontal: Float,
         val vertical: Float,

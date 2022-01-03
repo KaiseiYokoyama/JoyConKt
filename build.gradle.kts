@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "me.kyokoyama.joyconkt"
-version = "0.3.3"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
@@ -15,6 +15,9 @@ repositories {
 dependencies {
     implementation("org.hid4java:hid4java:0.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.3.2")
 }
 
 dependencies {
@@ -35,7 +38,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = group.toString()
                 artifactId = "joyconkt"
-                version = "0.3.3"
+                version = "0.4.0"
 
                 from(components["kotlin"])
             }

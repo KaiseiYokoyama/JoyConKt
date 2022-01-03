@@ -1,9 +1,11 @@
 package io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration
 
+import kotlinx.serialization.Serializable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.experimental.and
 
+@Serializable
 data class Sticks(
     val left: Stick,
     val right: Stick,
@@ -32,6 +34,7 @@ data class Sticks(
         }
     }
 
+    @Serializable
     data class Stick(
         val horizontal: Axis,
         val vertical: Axis,
@@ -71,6 +74,7 @@ data class Sticks(
             }
         }
 
+        @Serializable
         data class Axis(
             val max: UShort,
             val center: UShort,
