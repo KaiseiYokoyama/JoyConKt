@@ -4,24 +4,28 @@ import io.github.kaiseiyokoyama.joykonkt.controller.Controller
 import io.github.kaiseiyokoyama.joykonkt.controller.ProController
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
-import org.hid4java.HidDevice
-import org.hid4java.HidManager
-import org.hid4java.HidServicesListener
-import org.hid4java.HidServicesSpecification
+import org.hid4java.*
 import org.hid4java.event.HidServicesEvent
 
 object Manager : HidServicesListener {
-    val attachedChannel: Channel<Controller> = Channel()
+    val attachedChannel: Channel<Controller> = Channel(50)
     val detachedChannel: Channel<HidDevice> = Channel()
+    val service: HidServices by lazy {
+        val config = HidServicesSpecification()
+        config.isAutoStart = true
+        HidManager.getHidServices(config)
+    }
 
     init {
-        val config = HidServicesSpecification()
-        config.isAutoStart = false
-
-        val service = HidManager.getHidServices(config)
         service.addHidServicesListener(this)
 
         service.start()
+
+        service.attachedHidDevices.forEach {
+            ProController.tryNew(it)?.let {
+                attachedChannel.trySendBlocking(it)
+            }
+        }
     }
 
     override fun hidDeviceAttached(event: HidServicesEvent?) {

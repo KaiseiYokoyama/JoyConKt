@@ -41,4 +41,6 @@ fun main() {
             )
         }
     }
+
+    full?.controller?.devices()?.forEach { it -> it.close() }
 }
