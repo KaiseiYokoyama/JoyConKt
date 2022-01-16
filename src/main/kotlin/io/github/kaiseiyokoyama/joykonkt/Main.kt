@@ -2,12 +2,8 @@ package io.github.kaiseiyokoyama.joykonkt
 
 import io.github.kaiseiyokoyama.joykonkt.controller.Controller
 import io.github.kaiseiyokoyama.joykonkt.controller.InputMode
-import io.github.kaiseiyokoyama.joykonkt.controller.SubCommand
-import io.github.kaiseiyokoyama.joykonkt.controller.report.input.ID
-import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sticks
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.PlayerLight
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
-import kotlinx.coroutines.channels.Channel
 
 fun main() {
     val ach = Manager.attachedChannel

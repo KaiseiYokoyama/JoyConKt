@@ -4,12 +4,11 @@ import io.github.kaiseiyokoyama.joykonkt.controller.report.input.calibration.Sti
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.ID
 import io.github.kaiseiyokoyama.joykonkt.controller.report.output.Rumble
 import org.hid4java.HidDevice
-import java.lang.RuntimeException
 
 class ProController private constructor(
     private val hid: HidDevice,
 ) : Controller {
-    override lateinit var factoryCalibration: Sticks
+    override var factoryCalibration: Sticks? = null
 //    override lateinit var userCalibration: Sticks
 
     companion object {

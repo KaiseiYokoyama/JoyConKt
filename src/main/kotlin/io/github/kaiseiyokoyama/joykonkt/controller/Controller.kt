@@ -11,7 +11,7 @@ import java.nio.ByteOrder
 
 interface Controller {
     var globalPacketNumber: UInt
-    var factoryCalibration: Sticks
+    var factoryCalibration: Sticks?
 //    var userCalibration: Sticks
 
     companion object {
