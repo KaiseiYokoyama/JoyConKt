@@ -18,14 +18,7 @@ object Manager : HidServicesListener {
 
     init {
         service.addHidServicesListener(this)
-
         service.start()
-
-        service.attachedHidDevices.forEach {
-            ProController.tryNew(it)?.let {
-                attachedChannel.trySendBlocking(it)
-            }
-        }
     }
 
     override fun hidDeviceAttached(event: HidServicesEvent?) {
