@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "me.kyokoyama.joyconkt"
-version = "0.5.3"
+version = "0.6.1"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = group.toString()
                 artifactId = "joyconkt"
-                version = "0.5.3"
+                version = "0.6.1"
 
                 from(components["kotlin"])
             }
