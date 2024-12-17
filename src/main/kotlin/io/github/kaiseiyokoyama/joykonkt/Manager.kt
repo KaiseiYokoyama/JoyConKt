@@ -37,6 +37,10 @@ object Manager : HidServicesListener {
     }
 
     override fun hidFailure(event: HidServicesEvent?) {
-//        TODO("Not yet implemented")
+//        TODO("Not yet implemented");
+    }
+
+    override fun hidDataReceived(p0: HidServicesEvent?) {
+//        TODO("Not yet implemented");
     }
 }

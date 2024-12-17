@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.hid4java:hid4java:0.7.0")
+    implementation("org.hid4java:hid4java:0.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
